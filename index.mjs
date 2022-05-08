@@ -26,7 +26,7 @@ app.use(express.static(
 ));
 
 app.get('/', (req, res) => {
-    res.sendFile('../frontend/build/index.html');
+    res.sendFile(__dirname + '../frontend/build/index.html');
 });
 
 const args = argsParser(process.argv);
