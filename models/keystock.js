@@ -52,7 +52,7 @@ module.exports = (sequelize, DataTypes) => {
                     [Op.and]: conditions
                 },
                 order: [
-                    ['name', 'DESC']
+                    ['date', 'DESC']
                 ],
                 offset: offset,
                 limit: limit,
