@@ -6,6 +6,7 @@ import path from 'path';
 import todayRouter from './routers/today.mjs';
 import staticsRouter from './routers/statics.mjs';
 import queryRouter from './routers/query.mjs';
+import configuration from './config/index.mjs';
 
 import crawlKeyStocksToToday from './services/crawl.mjs';
 import logger from './services/logger.mjs';
@@ -14,19 +15,21 @@ import logger from './services/logger.mjs';
 
 const app = express();
 
+console.log(configuration);
+
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended : true }));
 
-app.use('/today', todayRouter);
-app.use('/statics', staticsRouter);
-app.use('/query', queryRouter);
+app.use('/api/key-stocks/v1/today', todayRouter);
+app.use('/api/key-stocks/v1/statics', staticsRouter);
+app.use('/api/key-stocks/v1/query', queryRouter);
 app.use(express.static(
-    '../frontend/build'
+    configuration.frontend
 ));
 
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '../frontend/build/index.html');
+app.get('/*', (req, res) => {
+    res.sendFile(configuration.index);
 });
 
 const args = argsParser(process.argv);
