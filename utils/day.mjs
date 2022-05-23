@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-
+ 
 dayjs.locale('kr');
 
 class Day {
@@ -47,6 +47,16 @@ class Day {
 
     delta(amount, unit) {
         return new Day(this.day.add(amount, unit));
+    }
+
+    nextBusinessDay() {
+        let dayOfWeek = this.day.day();
+
+        let adder = 1;
+        if (dayOfWeek == 5) adder = 3;
+        else if (dayOfWeek == 6) adder = 2;
+
+        return Day.create(this.day.add(adder, 'day'));
     }
 }
 

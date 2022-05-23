@@ -6,6 +6,7 @@ import path from 'path';
 import todayRouter from './routers/today.mjs';
 import staticsRouter from './routers/statics.mjs';
 import queryRouter from './routers/query.mjs';
+import crawlRouter from './routers/crawl.mjs';
 import configuration from './config/index.mjs';
 
 import crawlKeyStocksToToday from './services/crawl.mjs';
@@ -24,6 +25,8 @@ app.use(bodyParser.urlencoded({ extended : true }));
 app.use('/api/key-stocks/v1/today', todayRouter);
 app.use('/api/key-stocks/v1/statics', staticsRouter);
 app.use('/api/key-stocks/v1/query', queryRouter);
+app.use('/api/key-stocks/v1/crawl', crawlRouter);
+
 app.use(express.static(
     configuration.frontend
 ));

@@ -1,6 +1,7 @@
 import axios from 'axios';
-import iconv from 'iconv-lite';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
+import https from 'https';
+import { constants } from 'crypto'
 
 import Database from '../models/index.js';
 import Day from '../utils/day.mjs';
@@ -9,28 +10,39 @@ import logger from './logger.mjs';
 async function crawlKeyStocks(date)
 {
     logger.info('Crawlling Key Stocks of ' + date.toString());
-
+    
     const dateAsText = date.toString();
-    const url ='https://m.infostock.co.kr/dataBank/spot06.asp?mode=w&SearchField=%B3%AF%C2%A5&searchword=' + dateAsText;
+    var queryDay = date.nextBusinessDay();
+
+    const httpsAgent = new https.Agent({
+        secureOptions: constants.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION
+      });
+
+    const url = 'https://www.paxnet.co.kr/stock/infoStock/marketView?type=D&market=KSU&sendDate=' + queryDay.toString();
     const response = await axios.get(url, {
-        responseType: 'arraybuffer'
+        httpsAgent: httpsAgent
     });
-    const data = await response.data;
-    const html = iconv.decode(data, 'EUC-KR');
-       
-    let $ = await cheerio.load(html);
-    
-    var rows = $('div.table table tbody tr');
-    
-    var result = [];
-    for (var i = 0; i < rows.length; i++)
-    {
-        result.push({
-            name: $('a', rows[i]).text().split('(')[0].trim(),
-            code: $('a', rows[i]).text().match(/\(([0-9]+)\)/)[1],
-            reason: $('td.alL', rows[i]).text().trim(),
-            date: dateAsText
-        });
+    const html = response.data;
+
+    let $ = cheerio.load(html);
+
+    let contents = $('div[class="report-view-cont"] div p');
+
+    let child = contents.children()[0];
+    let result = [];
+    while (child != null) {
+
+        if (child.type === 'text') {
+            let stock = child.data.split(" : ");
+
+            result.push({
+                name: stock[0].split('(')[0].trim(),
+                code: stock[0].match(/\(([0-9]+)\)/)[1],
+                reason: stock[1],
+                date: dateAsText
+            })
+        }
+        child = child.next;
     }
 
     return result;
