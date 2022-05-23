@@ -4,7 +4,7 @@ import crawlKeyStocksToToday from '../services/crawl.mjs';
 var router = express.Router();
 
 router.get('/', async (req, res) => {
-    crawlKeyStocksToToday();
+    await crawlKeyStocksToToday();
 });
 
 export default router;
