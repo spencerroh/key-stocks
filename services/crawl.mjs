@@ -52,7 +52,7 @@ export default async function crawlKeyStocksToToday()
 {
     var lastUpdatedDate = await Database.KeyStock.lastUpdatedDate();
     var begin = Day.tomorrow(lastUpdatedDate ?? '2017-01-01');
-    var until = Day.today().tomorrow();
+    var until = Day.today().nextBusinessDay();
 
     logger.info('Crawlling Key Stocks from' + begin.toString() + ' until ' + until.toString());
 
