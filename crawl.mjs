@@ -1,11 +1,12 @@
 import axios from 'axios';
+import iconv from 'iconv-lite';
 import * as cheerio from 'cheerio';
 import https from 'https';
 import { constants } from 'crypto'
 
-import Database from '../models/index.js';
-import Day from '../utils/day.mjs';
-import logger from './logger.mjs';
+// import Database from '../models/index.js';
+import Day from './utils/day.mjs';
+import logger from './services/logger.mjs';
 
 async function crawlKeyStocks(date)
 {
@@ -18,7 +19,7 @@ async function crawlKeyStocks(date)
         secureOptions: constants.SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION
       });
 
-    const url = 'https://www.paxnet.co.kr/stock/infoStock/marketView?type=D&market=KSU&sendDate=' + queryDay.toString();
+    const url = 'https://www.paxnet.co.kr/stock/infoStock/marketView?type=D&market=KSU&sendDate=' + queryDay.toStringWithoutDash();
     const response = await axios.get(url, {
         httpsAgent: httpsAgent
     });
@@ -58,24 +59,4 @@ async function crawlKeyStocks(date)
     return result;
 }
 
-export default async function crawlKeyStocksToToday()
-{
-    var lastUpdatedDate = await Database.KeyStock.lastUpdatedDate();
-    var begin = Day.tomorrow(lastUpdatedDate ?? '2017-01-01');
-    var until = Day.today().nextBusinessDay();
-
-    logger.info('Crawlling Key Stocks from' + begin.toString() + ' until ' + until.toString());
-
-    await Day.forEachAsync(begin, until, async (day) => {
-        var keyStocks = await crawlKeyStocks(day);
-
-        for (var keyStock of keyStocks)
-        {
-            await Database.KeyStock.create({
-                name: keyStock.name, 
-                code: keyStock.code, 
-                reason: keyStock.reason, 
-                date: keyStock.date });
-        }
-    });
-}
+crawlKeyStocks(Day.create('20220603')).then(console.log).catch(e => {console.log(e) });

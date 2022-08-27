@@ -41,6 +41,10 @@ class Day {
         return this.day.format('YYYY-MM-DD');
     }
 
+    toStringWithoutDash() {
+        return this.day.format('YYYYMMDD');
+    }
+
     tomorrow() {
         return new Day(this.day.add(1, 'day'));
     }
