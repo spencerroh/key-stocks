@@ -40,16 +40,24 @@ module.exports = (sequelize, DataTypes) => {
         }
 
         static async findRelatedStocks(keywords, offset, limit, raw = false) {
-            var conditions = [];
+            let reasonConditions = [];
+            let nameConditions = [];
             keywords.forEach(keyword => {
-                conditions.push({
+                reasonConditions.push({
                     reason: { [Op.like]: '%' + keyword + '%' }
+                });
+
+                nameConditions.push({
+                    name: { [Op.like]: '%' + keyword + '%' }
                 });
             });
 
-            var { count, rows } = await this.findAndCountAll({
+            let { count, rows } = await this.findAndCountAll({
                 where: {
-                    [Op.and]: conditions
+                    [Op.or] : [
+                        { [Op.and]: nameConditions },
+                        { [Op.and]: reasonConditions }
+                    ]
                 },
                 order: [
                     ['date', 'DESC']
