@@ -74,6 +74,14 @@ module.exports = (sequelize, DataTypes) => {
                 stocks: rows
             }
         }
+
+        static async getAllStocks() {
+            let stocks = await this.findAll();
+
+            return {
+                stocks: stocks
+            };
+        }
     }
 
     KeyStock.init({

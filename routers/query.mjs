@@ -41,4 +41,12 @@ router.post('/rank', async (req, res) => {
     res.json(results);
 });
 
+router.get('/all', async (req, res) => {
+    var all = await db.KeyStock.getAllStocks();
+
+    console.log(all);
+
+    res.json(all);
+});
+
 export default router;
